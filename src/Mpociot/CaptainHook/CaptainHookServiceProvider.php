@@ -4,7 +4,6 @@ namespace Mpociot\CaptainHook;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
@@ -77,7 +76,8 @@ class CaptainHookServiceProvider extends ServiceProvider
     {
         $this->registerCommands();
 
-        if (Str::is('5.4.*', $this->app->version())) {
+        // Make campabitle with Laravel 5.4.0+
+        if (version_compare('5.4.0', $this->app->version(), '<=')) {
             $this->registerEventDispatcher();
         }
     }
