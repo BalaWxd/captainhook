@@ -83,6 +83,7 @@ class TriggerWebhooksJob implements ShouldQueue
         $logging = $config->get('captain_hook.log.active');
         $transformer = $this->resolveCallable($config->get('captain_hook.transformer'), 'transform');
         $responseCallback = $this->resolveCallable($config->get('captain_hook.response_callback'), 'handle');
+        $requestHeaderCallable = $this->resolveCallable($config->get('captain_hook.request_header'), 'httpRequestHeader');
 
         foreach ($this->webhooks as $webhook) {
             if ($logging) {
@@ -118,6 +119,7 @@ class TriggerWebhooksJob implements ShouldQueue
                     'exceptions' => false,
                     'body' => $transformer($this->eventData, $webhook),
                     'verify' => false,
+                    'headers' => $requestHeaderCallable($this->eventData, $webhook, []),
                     'handler' => $middleware($client->getConfig('handler')),
                 ]);
             } else {
@@ -125,6 +127,7 @@ class TriggerWebhooksJob implements ShouldQueue
                     'exceptions' => false,
                     'body' => $transformer($this->eventData, $webhook),
                     'verify' => false,
+                    'headers' => $requestHeaderCallable($this->eventData, $webhook, []),
                     'timeout' => 10,
                 ]);
             }

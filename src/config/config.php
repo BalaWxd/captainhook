@@ -56,6 +56,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Webhook http request header
+    |--------------------------------------------------------------------------
+    |
+    | If the outgoing webhook requires some special headers can be set from here,
+    | such as authorization header. The second argument is
+    | the WebHook that was triggered in case you want to transform the data in
+    | different ways per hook.
+    |
+    | You can also use the 'Foo\Class@httpRequestHeader' notation if you want.
+    |
+    */
+    'request_header' => function ($payload, $webhook, $header = []) {
+        $secret = env('CAPTAINHOOK_SIGNATURE_SECRET');
+        $algorithm = env('CAPTAINHOOK_SIGNATURE_ALGORITHM', 'sha1');
+
+        return [
+            'Content-Type' => 'application/json',
+            'X-Hub-Signature' => $algorithm . '=' . hash_hmac($algorithm, json_encode($payload), $secret, false),
+        ] + $header;
+    },
+
+    /*
+    |--------------------------------------------------------------------------
     | Webhook response callback
     |--------------------------------------------------------------------------
     |
